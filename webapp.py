@@ -8,7 +8,11 @@ app = Flask(__name__)
 def render_main():
     with open('county_demographics.json') as demographics_data:
         counties = json.load(demographics_data)
-    return render_template('start.html', options=get_state_options(counties))
+    if "state" in request.args:
+        state = request.args['state']
+        return render_template('start.html', options=get_state_options(counties) , funfact=fun_fact(state, counties))
+    if "state" is not request.args:
+        return render_template('start.html', options=get_state_options(counties))
 def get_state_options(counties):
     options=""
     listOfStates=[]
@@ -18,6 +22,9 @@ def get_state_options(counties):
     for x in listOfStates:
         options += Markup("<option value=\"" + x + "\">" + x + "</option>")
     return options
-
+def fun_fact(state,counties):
+    for x in counties:
+        if state == x["State"]:
+         return x["Population"]["2014 Population"]
 if __name__=="__main__":
     app.run(debug=True, port=54321)
